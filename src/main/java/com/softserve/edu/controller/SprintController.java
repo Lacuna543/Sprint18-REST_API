@@ -2,7 +2,7 @@ package com.softserve.edu.controller;
 
 import com.softserve.edu.model.Sprint;
 import com.softserve.edu.model.User;
-import com.softserve.edu.security.WebAuthenticationToken;
+//import com.softserve.edu.security.WebAuthenticationToken;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.SprintService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -60,10 +60,10 @@ public class SprintController {
         return "sprints";
     }
 
-    public boolean getMarathonIdByUser(long marathonId) {
-        WebAuthenticationToken authentication
-                = (WebAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getDetails();
-        return user.getMarathons().stream().anyMatch(marathon -> marathon.getId() == marathonId);
-    }
+//    public boolean getMarathonIdByUser(long marathonId) {
+//        WebAuthenticationToken authentication
+//                = (WebAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+//        User user = (User) authentication.getDetails();
+//        return user.getMarathons().stream().anyMatch(marathon -> marathon.getId() == marathonId);
+//    }
 }

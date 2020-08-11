@@ -2,7 +2,7 @@ package com.softserve.edu.controller;
 
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.User;
-import com.softserve.edu.security.WebAuthenticationToken;
+//import com.softserve.edu.security.WebAuthenticationToken;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.UserService;
 import lombok.Data;
@@ -77,39 +77,39 @@ public class MarathonController {
         return "redirect:/marathons";
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/students/{marathon_id}")
-    public String getStudentsFromMarathon(@PathVariable("marathon_id") long marathonId, Model model) {
-        WebAuthenticationToken authentication
-                = (WebAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("TRAINEE"))) {
-            return "redirect:/sprints/" + marathonId;
-        }
-        List<User> students = studentService.getAll().stream().filter(
-                student -> student.getMarathons().stream().anyMatch(
-                        marathon -> marathon.getId() == marathonId)).collect(Collectors.toList());
-        Marathon marathon = marathonService.getMarathonById(marathonId);
-        model.addAttribute("students", students);
-        model.addAttribute("all_students", studentService.getAll());
-        model.addAttribute("marathon", marathon);
-        return "marathon-students";
-    }
+//    @PreAuthorize("isAuthenticated()")
+//    @GetMapping("/students/{marathon_id}")
+//    public String getStudentsFromMarathon(@PathVariable("marathon_id") long marathonId, Model model) {
+//        WebAuthenticationToken authentication
+//                = (WebAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication.getAuthorities().stream()
+//                .anyMatch(authority -> authority.getAuthority().equals("TRAINEE"))) {
+//            return "redirect:/sprints/" + marathonId;
+//        }
+//        List<User> students = studentService.getAll().stream().filter(
+//                student -> student.getMarathons().stream().anyMatch(
+//                        marathon -> marathon.getId() == marathonId)).collect(Collectors.toList());
+//        Marathon marathon = marathonService.getMarathonById(marathonId);
+//        model.addAttribute("students", students);
+//        model.addAttribute("all_students", studentService.getAll());
+//        model.addAttribute("marathon", marathon);
+//        return "marathon-students";
+//    }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/marathons")
-    public String getAllMarathons(Model model) {
-        List<Marathon> marathons;
-        WebAuthenticationToken authentication
-                = (WebAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("MENTOR"))) {
-            marathons = marathonService.getAll();
-        } else {
-            User user = (User)authentication.getDetails();
-            marathons = user.getMarathons();
-        }
-        model.addAttribute("marathons", marathons);
-        return "marathons";
-    }
+//    @PreAuthorize("isAuthenticated()")
+//    @GetMapping("/marathons")
+//    public String getAllMarathons(Model model) {
+//        List<Marathon> marathons;
+//        WebAuthenticationToken authentication
+//                = (WebAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication.getAuthorities().stream()
+//                .anyMatch(authority -> authority.getAuthority().equals("MENTOR"))) {
+//            marathons = marathonService.getAll();
+//        } else {
+//            User user = (User)authentication.getDetails();
+//            marathons = user.getMarathons();
+//        }
+//        model.addAttribute("marathons", marathons);
+//        return "marathons";
+//    }
 }
