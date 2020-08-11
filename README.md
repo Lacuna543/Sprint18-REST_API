@@ -1,1 +1,1 @@
-# Marathon Web Project Template for Sprint #14
+# Marathon Web Project Example for Sprint #18

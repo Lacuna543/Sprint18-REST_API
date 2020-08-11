@@ -1,5 +1,7 @@
 package com.softserve.edu.service.impl;
 
+import com.softserve.edu.dto.UserRequest;
+import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.User;
@@ -28,6 +30,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                            MarathonRepository marathonRepository) {
         this.userRepository = userRepository;
         this.marathonRepository = marathonRepository;
+    }
+
+    public User findByLogin(String login) {
+        return userRepository.getUserByEmail(login);
+    }
+
+    public UserResponse findByLoginAndPassword(UserRequest userRequest) {
+        UserResponse userResponse = null;
+        User user = userRepository.getUserByEmail(userRequest.getLogin());
+        if (user != null) {
+            userResponse = new UserResponse();
+            userResponse.setLogin(userRequest.getLogin());
+            userResponse.setRolename(user.getRole().getName());
+        }
+        return userResponse;
     }
 
     public List<User> getAll() {
