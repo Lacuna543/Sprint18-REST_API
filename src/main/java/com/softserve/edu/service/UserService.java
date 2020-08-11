@@ -1,5 +1,7 @@
 package com.softserve.edu.service;
 
+import com.softserve.edu.dto.UserRequest;
+import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,8 +13,12 @@ public interface UserService {
     List<User> getAll();
     User getUserById(Long id);
     UserDetails loadUserByUsername(String username);
-    User createOrUpdateUser( User user);
+    boolean createOrUpdateUser(UserRequest userRequest);
     void deleteUserById(Long id);
     boolean addUserToMarathon(User user, Marathon marathon);
     boolean deleteUserFromMarathon(User user, Marathon marathon);
+
+    public User findByLogin(String login);
+    UserResponse findByLoginAndPassword(UserRequest userRequest);
+
 }

@@ -1,5 +1,10 @@
 package com.softserve.edu.controller;
 
+import com.softserve.edu.config.JwtProvider;
+import com.softserve.edu.dto.OperationResponse;
+import com.softserve.edu.dto.TokenResponse;
+import com.softserve.edu.dto.UserRequest;
+import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Role;
 import com.softserve.edu.model.User;
@@ -20,7 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+//@Controller
+@RestController
 @Data
 public class UserController {
 
@@ -28,11 +34,16 @@ public class UserController {
     private RoleService roleService;
     private MarathonService marathonService;
     private PasswordEncoder passwordEncoder;
+    private JwtProvider jwtProvider;
 
-    public UserController(UserService userService, RoleService roleService, MarathonService marathonService) {
+    public UserController(UserService userService,
+                          RoleService roleService,
+                          MarathonService marathonService,
+                          JwtProvider jwtProvider) {
         this.userService = userService;
         this.roleService = roleService;
         this.marathonService = marathonService;
+        this.jwtProvider = jwtProvider;
     }
 
     @Autowired
@@ -50,24 +61,52 @@ public class UserController {
         return "create-student";
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
-    @PostMapping("students/add")
-    public String createStudent(@RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId, @RequestParam("role_id") long roleId,
-                                @Validated @ModelAttribute User user, BindingResult result) {
-        if (result.hasErrors()) {
-            return "create-student";
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(roleService.getRoleById(roleId));
-        if (marathonId != 0) {
-            userService.addUserToMarathon(
-                    userService.createOrUpdateUser(user),
-                    marathonService.getMarathonById(marathonId));
-            return "redirect:/students/" + marathonId;
-        }
-        userService.createOrUpdateUser(user);
-        return "redirect:/students";
+    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+    public OperationResponse signUp() {
+        return new OperationResponse("true");
     }
+
+    @PostMapping("/signup")
+    public OperationResponse signUp(
+            @RequestParam(value = "login", required = true)
+                    String login,
+            @RequestParam(value = "password", required = true)
+                    String password) {
+//        log.info("**/signup userLogin = " + login);
+        UserRequest userRequest = new UserRequest(login, password);
+        return new OperationResponse(String.valueOf(userService.createOrUpdateUser(userRequest)));
+    }
+
+    @PostMapping("/signin")
+    public TokenResponse signIn(
+            @RequestParam(value = "login", required = true)
+                    String login,
+            @RequestParam(value = "password", required = true)
+                    String password) {
+//        log.info("**/signin userLogin = " + login);
+        UserRequest userRequest = new UserRequest(login, password);
+        UserResponse userResponse = userService.findByLoginAndPassword(userRequest);
+        return new TokenResponse(jwtProvider.generateToken(userResponse.getLogin()));
+    }
+
+//    @PreAuthorize("hasAuthority('MENTOR')")
+//    @PostMapping("students/add")
+//    public String createStudent(@RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId, @RequestParam("role_id") long roleId,
+//                                @Validated @ModelAttribute User user, BindingResult result) {
+//        if (result.hasErrors()) {
+//            return "create-student";
+//        }
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        user.setRole(roleService.getRoleById(roleId));
+//        if (marathonId != 0) {
+//            userService.addUserToMarathon(
+//                    userService.createOrUpdateUser(user),
+//                    marathonService.getMarathonById(marathonId));
+//            return "redirect:/students/" + marathonId;
+//        }
+//        userService.createOrUpdateUser(user);
+//        return "redirect:/students";
+//    }
 
     @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("students/{marathon_id}/add")
@@ -90,22 +129,22 @@ public class UserController {
         return "update-student";
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
-    @PostMapping("/students/edit/{id}")
-    public String updateStudent(@PathVariable long id, @RequestParam("role_id") long roleId,
-                                @RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId,
-                                @Validated @ModelAttribute User user, BindingResult result) {
-        if (result.hasErrors()) {
-            return "update-marathon";
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(roleService.getRoleById(roleId));
-        userService.createOrUpdateUser(user);
-        if (marathonId != 0) {
-            return "redirect:/students/" + marathonId;
-        }
-        return "redirect:/students";
-    }
+//    @PreAuthorize("hasAuthority('MENTOR')")
+//    @PostMapping("/students/edit/{id}")
+//    public String updateStudent(@PathVariable long id, @RequestParam("role_id") long roleId,
+//                                @RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId,
+//                                @Validated @ModelAttribute User user, BindingResult result) {
+//        if (result.hasErrors()) {
+//            return "update-marathon";
+//        }
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        user.setRole(roleService.getRoleById(roleId));
+//        userService.createOrUpdateUser(user);
+//        if (marathonId != 0) {
+//            return "redirect:/students/" + marathonId;
+//        }
+//        return "redirect:/students";
+//    }
 
     @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("/students/{marathon_id}/delete/{student_id}")

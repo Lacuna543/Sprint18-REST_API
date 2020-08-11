@@ -4,13 +4,17 @@ import com.softserve.edu.dto.UserRequest;
 import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
+import com.softserve.edu.model.RoleData;
 import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
+import com.softserve.edu.repository.RoleRepository;
 import com.softserve.edu.repository.UserRepository;
 import com.softserve.edu.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -25,11 +29,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final MarathonRepository marathonRepository;
+    private RoleRepository roleRepository;
+    private PasswordEncoder passwordEncoder;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository,
-                           MarathonRepository marathonRepository) {
+                           MarathonRepository marathonRepository,
+                           RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.marathonRepository = marathonRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User findByLogin(String login) {
@@ -56,8 +67,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No user /w id "+id)));
     }
 
-    public User createOrUpdateUser(User entity) {
-        return userRepository.save(entity);
+//    public User createOrUpdateUser(User entity) {
+//        return userRepository.save(entity);
+
+//    }
+
+    public boolean createOrUpdateUser(UserRequest userRequest) {
+        User user = new User();
+        user.setRole(roleRepository.findByName(RoleData.USER.toString()));
+        user.setEmail(userRequest.getLogin());
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        return (userRepository.save(user) != null);
     }
 
     @Override
