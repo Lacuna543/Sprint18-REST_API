@@ -60,11 +60,10 @@ public class MarathonController {
         }
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("/marathons/delete/{id}")
     public String deleteMarathon(@PathVariable long id) {
         marathonService.deleteMarathonById(id);
-        return "redirect:/marathons";
+        return "marathon successfully deleted";
     }
 
 
