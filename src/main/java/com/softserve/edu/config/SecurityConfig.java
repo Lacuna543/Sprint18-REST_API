@@ -27,6 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/marathons/delete/*").hasRole("ADMIN")
+                .antMatchers("/create-marathon").hasRole("ADMIN")
                 .antMatchers("/marathons").hasAnyRole("ADMIN", "USER")
                 .antMatchers("/signup", "/signin").permitAll()
                 .and()
