@@ -28,14 +28,14 @@ public class SprintController {
         this.marathonService = marathonService;
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/create-sprint/{marathon_id}")
     public String createSprint(@PathVariable("marathon_id") long marathonId, Model model) {
         model.addAttribute("sprint", new Sprint());
         return "create-sprint";
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create-sprint/{marathon_id}")
     public String createSprint(@Validated @ModelAttribute Sprint sprint, @PathVariable("marathon_id") long marathonId,
                                @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
@@ -51,7 +51,7 @@ public class SprintController {
         return "redirect:/sprints/" + marathonId;
     }
 
-    @PreAuthorize("hasAuthority('MENTOR') or hasAuthority('TRAINEE') and @sprintController.getMarathonIdByUser(#marathonId)")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINEE') and @sprintController.getMarathonIdByUser(#marathonId)")
     @GetMapping("/sprints/{marathon_id}")
     public String getAllSprintsFromMarathon(@PathVariable("marathon_id") long marathonId, Model model) {
         List<Sprint> sprints = sprintService.getSprintsByMarathonId(marathonId);

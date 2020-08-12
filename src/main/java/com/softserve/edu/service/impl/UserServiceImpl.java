@@ -1,16 +1,15 @@
 package com.softserve.edu.service.impl;
 
+import com.softserve.edu.dto.CreateOrUpdateUserRequest;
 import com.softserve.edu.dto.UserRequest;
 import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
-import com.softserve.edu.model.RoleData;
 import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.repository.RoleRepository;
 import com.softserve.edu.repository.UserRepository;
 import com.softserve.edu.service.UserService;
-import io.jsonwebtoken.lang.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +21,6 @@ import javax.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -72,24 +70,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 //    }
 
-    public UserResponse createOrUpdateUser(UserRequest userRequest) {
+//    public UserResponse createOrUpdateUser(CreateUserRequest userRequest) {
+//
+//        User newUser = new User();
+//        if (userRequest.getUserId() != null) {
+//
+//            Optional<User> userOptional = userRepository.findById(userRequest.getUserId());
+//
+//            if (userOptional.isPresent()) {
+//                newUser = userOptional.get();
+//            }
+//        }
+//
+//        newUser.setEmail(userRequest.getEmail());
+//        newUser.setPassword(userRequest.getPassword());
+//        newUser.setFirstName(userRequest.getFirstName());
+//        newUser.setLastName(userRequest.getLastName());
+//        newUser.setRole(userRequest.getRole());
+//
+//        userRepository.save(newUser);
+//        return new UserResponse(newUser);
+//    }
 
+    public UserResponse createUser(CreateOrUpdateUserRequest request) {
         User newUser = new User();
-        if (userRequest.getUserId() != null) {
+        newUser.setFirstName(request.getFirstName());
+        newUser.setLastName(request.getLastName());
+        newUser.setEmail(request.getEmail());
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        newUser.setRole(roleRepository.findByName(request.getRole()));//<--HARD CODE!!
+        userRepository.save(newUser);
+        return new UserResponse(newUser);
+    }
 
-            Optional<User> userOptional = userRepository.findById(userRequest.getUserId());
-
-            if (userOptional.isPresent()) {
-                newUser = userOptional.get();
-            }
-        }
-
-        newUser.setEmail(userRequest.getEmail());
-        newUser.setPassword(userRequest.getPassword());
-        newUser.setFirstName(userRequest.getFirstName());
-        newUser.setLastName(userRequest.getLastName());
-        newUser.setRole(userRequest.getRole());
-
+    @Override
+    public UserResponse updateUser(CreateOrUpdateUserRequest request, Long id) {
+        User newUser =userRepository.getOne(id);
+        newUser.setFirstName(request.getFirstName());
+        newUser.setLastName(request.getLastName());
+        newUser.setEmail(request.getEmail());
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+        newUser.setRole(roleRepository.findByName(request.getRole()));
         userRepository.save(newUser);
         return new UserResponse(newUser);
     }
