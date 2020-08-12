@@ -94,25 +94,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public UserResponse createUser(CreateOrUpdateUserRequest request) {
         User newUser = new User();
-        newUser.setFirstName(request.getFirstName());
-        newUser.setLastName(request.getLastName());
-        newUser.setEmail(request.getEmail());
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setRole(roleRepository.findByName(request.getRole()));//<--HARD CODE!!
-        userRepository.save(newUser);
-        return new UserResponse(newUser);
+        return new UserResponse(fillUserFromUserRequest(request, newUser));
     }
 
-    @Override
-    public UserResponse updateUser(CreateOrUpdateUserRequest request, Long id) {
-        User newUser =userRepository.getOne(id);
+    private User fillUserFromUserRequest(CreateOrUpdateUserRequest request, User newUser) {
         newUser.setFirstName(request.getFirstName());
         newUser.setLastName(request.getLastName());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setRole(roleRepository.findByName(request.getRole()));
         userRepository.save(newUser);
-        return new UserResponse(newUser);
+        return newUser;
+    }
+
+    @Override
+    public UserResponse updateUser(CreateOrUpdateUserRequest request, Long id) {
+        User newUser =userRepository.getOne(id);
+        return new UserResponse(fillUserFromUserRequest(request, newUser));
     }
 
     @Override
