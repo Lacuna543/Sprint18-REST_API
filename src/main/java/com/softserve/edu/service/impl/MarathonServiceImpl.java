@@ -2,6 +2,8 @@ package com.softserve.edu.service.impl;
 
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
+import com.softserve.edu.model.RoleData;
+import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.service.MarathonService;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -1,8 +1,12 @@
 package com.softserve.edu.controller;
 
+import com.softserve.edu.config.JwtProvider;
 import com.softserve.edu.model.Marathon;
+import com.softserve.edu.model.Role;
+import com.softserve.edu.model.RoleData;
 import com.softserve.edu.model.User;
 //import com.softserve.edu.security.WebAuthenticationToken;
+import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.UserService;
 import lombok.Data;
@@ -16,24 +20,60 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @Data
 public class MarathonController {
-    private MarathonService marathonService;
-    private UserService studentService;
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer ";
 
-    public MarathonController(MarathonService marathonService, UserService studentService) {
+    private MarathonService marathonService;
+    private MarathonRepository marathonRepository;
+    private UserService studentService;
+    private JwtProvider jwtProvider;
+
+    public MarathonController(MarathonService marathonService,
+                              MarathonRepository marathonRepository,
+                              UserService studentService,
+                              JwtProvider jwtProvider) {
         this.marathonService = marathonService;
         this.studentService = studentService;
+        this.jwtProvider = jwtProvider;
+        this.marathonRepository = marathonRepository;
     }
+  //new methods
+
+    @GetMapping("/marathons")
+    public List<Marathon> listMarathons(@RequestHeader("Authorization") String token) {
+//        log.info("**/marathons");
+        String login = jwtProvider.getLoginFromToken(token.substring(BEARER.length()));
+        User user = studentService.findByLogin(login);
+        Role userRole = user.getRole();
+        if (userRole.getName().equals(RoleData.ADMIN.toString())) {
+            return marathonService.getAll();
+        } else {
+            return marathonRepository.getAllByUsers(user);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('MENTOR')")
+    @GetMapping("/marathons/delete/{id}")
+    public String deleteMarathon(@PathVariable long id) {
+        marathonService.deleteMarathonById(id);
+        return "redirect:/marathons";
+    }
+
+
+
+
+
+
+
+//old methods
 
     @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("/create-marathon")
@@ -70,12 +110,12 @@ public class MarathonController {
         return "redirect:/marathons";
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
-    @GetMapping("/marathons/delete/{id}")
-    public String deleteMarathon(@PathVariable long id) {
-        marathonService.deleteMarathonById(id);
-        return "redirect:/marathons";
-    }
+//    @PreAuthorize("hasAuthority('MENTOR')")
+//    @GetMapping("/marathons/delete/{id}")
+//    public String deleteMarathon(@PathVariable long id) {
+//        marathonService.deleteMarathonById(id);
+//        return "redirect:/marathons";
+//    }
 
 //    @PreAuthorize("isAuthenticated()")
 //    @GetMapping("/students/{marathon_id}")
@@ -112,4 +152,6 @@ public class MarathonController {
 //        model.addAttribute("marathons", marathons);
 //        return "marathons";
 //    }
+
+
 }
