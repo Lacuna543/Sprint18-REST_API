@@ -54,7 +54,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("/create-student")
-    public String createStudent(Model model) {
+    public String addUserToMarathon(Model model) {
         List<Role> roles = roleService.getAll();
         model.addAttribute("roles", roles);
         model.addAttribute("user", new User());
@@ -108,13 +108,14 @@ public class UserController {
 //        return "redirect:/students";
 //    }
 
+    //updated
     @PreAuthorize("hasAuthority('MENTOR')")
-    @GetMapping("students/{marathon_id}/add")
-    public String createStudent(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
+    @PostMapping("students/{marathon_id}/add")
+    public String addUserToMarathon(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
         userService.addUserToMarathon(
                 userService.getUserById(userId),
                 marathonService.getMarathonById(marathonId));
-        return "redirect:/students/" + marathonId;
+        return "User added to marathon " + marathonId;
     }
 
     @PreAuthorize("hasAuthority('MENTOR')")
@@ -155,12 +156,11 @@ public class UserController {
         return "redirect:/students/" + marathonId;
     }
 
+    //updated
     @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("/students")
-    public String getAllStudents(Model model) {
-        List<User> students = userService.getAll();
-        model.addAttribute("students", students);
-        return "students";
+    public List<User> getAllStudents(Model model) {
+        return userService.getAll();
     }
 
     @PreAuthorize("hasAuthority('MENTOR')")

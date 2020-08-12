@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             userResponse.setRolename(user.getRole().getName());
         }
         return userResponse;
-    }
+    }   
 
     public List<User> getAll() {
         List<User> users = userRepository.findAll();
