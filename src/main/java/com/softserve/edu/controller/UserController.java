@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Controller
 @RestController
 @Data
 @Slf4j
@@ -79,14 +78,12 @@ public class UserController {
     }
 
     //updated
-    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create-user")
     public UserResponse createUser(CreateOrUpdateUserRequest request) {
         log.info("**/create-user");
         return userService.createUser(request);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/update-user/{user_id}")
     public UserResponse updateUser(CreateOrUpdateUserRequest request, @PathVariable ("user_id") Long userId) {
         log.info("**/update-user");
@@ -95,7 +92,6 @@ public class UserController {
 
 
     //updated
-    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("students/{marathon_id}/add")
     public String addUserToMarathon(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
         userService.addUserToMarathon(
@@ -103,6 +99,14 @@ public class UserController {
                 marathonService.getMarathonById(marathonId));
         return "User added to marathon " + marathonId;
     }
+
+//    @PostMapping("students/{marathon_id}/add")
+//    public String addUserToMarathon(User user, @PathVariable("marathon_id") long marathonId) {
+//        userService.addUserToMarathon(
+//                userService.getUserById(user.getId()),
+//                marathonService.getMarathonById(marathonId));
+//        return "User added to marathon " + marathonId;
+//    }
 
 //    @PreAuthorize("hasAuthority('MENTOR')")
 //    @GetMapping("/students/{marathon_id}/edit/{student_id}")
