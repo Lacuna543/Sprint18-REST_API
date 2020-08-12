@@ -27,6 +27,12 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
+    public Role getRoleByName(String name) {
+        return roleRepository.findByName(name);
+    }
+
+    @Override
+    @Transactional
     public List<Role> getAll() {
         List<Role> roles = roleRepository.findAll();
         return roles.isEmpty() ? new ArrayList<>() : roles;

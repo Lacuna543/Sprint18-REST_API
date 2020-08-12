@@ -10,6 +10,7 @@ import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.repository.RoleRepository;
 import com.softserve.edu.repository.UserRepository;
 import com.softserve.edu.service.UserService;
+import io.jsonwebtoken.lang.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -49,11 +51,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public UserResponse findByLoginAndPassword(UserRequest userRequest) {
         UserResponse userResponse = null;
-        User user = userRepository.getUserByEmail(userRequest.getLogin());
+        User user = userRepository.getUserByEmail(userRequest.getEmail());
         if (user != null) {
-            userResponse = new UserResponse();
-            userResponse.setLogin(userRequest.getLogin());
-            userResponse.setRolename(user.getRole().getName());
+            userResponse = new UserResponse(user);
         }
         return userResponse;
     }   
@@ -72,12 +72,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 //    }
 
-    public boolean createOrUpdateUser(UserRequest userRequest) {
-        User user = new User();
-        user.setRole(roleRepository.findByName(RoleData.USER.toString()));
-        user.setEmail(userRequest.getLogin());
-        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        return (userRepository.save(user) != null);
+    public UserResponse createOrUpdateUser(UserRequest userRequest) {
+
+        User newUser = new User();
+        if (userRequest.getUserId() != null) {
+
+            Optional<User> userOptional = userRepository.findById(userRequest.getUserId());
+
+            if (userOptional.isPresent()) {
+                newUser = userOptional.get();
+            }
+        }
+
+        newUser.setEmail(userRequest.getEmail());
+        newUser.setPassword(userRequest.getPassword());
+        newUser.setFirstName(userRequest.getFirstName());
+        newUser.setLastName(userRequest.getLastName());
+        newUser.setRole(userRequest.getRole());
+
+        userRepository.save(newUser);
+        return new UserResponse(newUser);
     }
 
     @Override

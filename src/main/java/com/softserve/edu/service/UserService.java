@@ -13,7 +13,7 @@ public interface UserService {
     List<User> getAll();
     User getUserById(Long id);
     UserDetails loadUserByUsername(String username);
-    boolean createOrUpdateUser(UserRequest userRequest);
+    UserResponse createOrUpdateUser(UserRequest userRequest);
     void deleteUserById(Long id);
     boolean addUserToMarathon(User user, Marathon marathon);
     boolean deleteUserFromMarathon(User user, Marathon marathon);

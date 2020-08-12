@@ -7,6 +7,7 @@ import com.softserve.edu.dto.UserRequest;
 import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Role;
+import com.softserve.edu.model.RoleData;
 import com.softserve.edu.model.User;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.RoleService;
@@ -74,6 +75,7 @@ public class UserController {
                     String password) {
 //        log.info("**/signup userLogin = " + login);
         UserRequest userRequest = new UserRequest(login, password);
+        userRequest.setRole(roleService.getRoleByName(RoleData.USER.toString()));
         return new OperationResponse(String.valueOf(userService.createOrUpdateUser(userRequest)));
     }
 
@@ -86,27 +88,17 @@ public class UserController {
 //        log.info("**/signin userLogin = " + login);
         UserRequest userRequest = new UserRequest(login, password);
         UserResponse userResponse = userService.findByLoginAndPassword(userRequest);
-        return new TokenResponse(jwtProvider.generateToken(userResponse.getLogin()));
+        return new TokenResponse(jwtProvider.generateToken(userResponse.getEmail()));
     }
 
-//    @PreAuthorize("hasAuthority('MENTOR')")
-//    @PostMapping("students/add")
-//    public String createStudent(@RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId, @RequestParam("role_id") long roleId,
-//                                @Validated @ModelAttribute User user, BindingResult result) {
-//        if (result.hasErrors()) {
-//            return "create-student";
-//        }
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        user.setRole(roleService.getRoleById(roleId));
-//        if (marathonId != 0) {
-//            userService.addUserToMarathon(
-//                    userService.createOrUpdateUser(user),
-//                    marathonService.getMarathonById(marathonId));
-//            return "redirect:/students/" + marathonId;
-//        }
-//        userService.createOrUpdateUser(user);
-//        return "redirect:/students";
-//    }
+    @PreAuthorize("hasAuthority('MENTOR')")
+    @PostMapping("students/add")
+    public UserResponse createStudent(@RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId, @RequestParam("role_id") long roleId,
+                                @Validated @ModelAttribute User user, BindingResult result) {
+        UserRequest userRequest = new UserRequest(user);
+        userRequest.setRole(roleService.getRoleByName(RoleData.USER.toString()));
+        return userService.createOrUpdateUser(userRequest);
+    }
 
     //updated
     @PreAuthorize("hasAuthority('MENTOR')")
@@ -184,11 +176,10 @@ public class UserController {
         return "redirect:/students";
     }
 
+    //updated
     @GetMapping("/user/{id}")
-    public String showUser(@PathVariable("id") long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-        return "user-info";
+    public User showUser(@PathVariable("id") long id, Model model) {
+        return userService.getUserById(id);
     }
 
 }
