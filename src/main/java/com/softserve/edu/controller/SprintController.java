@@ -60,10 +60,4 @@ public class SprintController {
         return "sprints";
     }
 
-//    public boolean getMarathonIdByUser(long marathonId) {
-//        WebAuthenticationToken authentication
-//                = (WebAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-//        User user = (User) authentication.getDetails();
-//        return user.getMarathons().stream().anyMatch(marathon -> marathon.getId() == marathonId);
-//    }
 }

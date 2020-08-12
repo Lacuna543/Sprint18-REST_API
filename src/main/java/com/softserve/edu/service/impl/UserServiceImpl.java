@@ -65,33 +65,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No user /w id "+id)));
     }
 
-//    public User createOrUpdateUser(User entity) {
-//        return userRepository.save(entity);
-
-//    }
-
-//    public UserResponse createOrUpdateUser(CreateUserRequest userRequest) {
-//
-//        User newUser = new User();
-//        if (userRequest.getUserId() != null) {
-//
-//            Optional<User> userOptional = userRepository.findById(userRequest.getUserId());
-//
-//            if (userOptional.isPresent()) {
-//                newUser = userOptional.get();
-//            }
-//        }
-//
-//        newUser.setEmail(userRequest.getEmail());
-//        newUser.setPassword(userRequest.getPassword());
-//        newUser.setFirstName(userRequest.getFirstName());
-//        newUser.setLastName(userRequest.getLastName());
-//        newUser.setRole(userRequest.getRole());
-//
-//        userRepository.save(newUser);
-//        return new UserResponse(newUser);
-//    }
-
     public UserResponse createUser(CreateOrUpdateUserRequest request) {
         User newUser = new User();
         newUser.setFirstName(request.getFirstName());

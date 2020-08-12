@@ -1,7 +1,9 @@
 package com.softserve.edu.controller;
 
 import com.softserve.edu.config.JwtProvider;
+import com.softserve.edu.dto.MarathonInfo;
 import com.softserve.edu.dto.MarathonRequest;
+import com.softserve.edu.dto.UserInfo;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Role;
 import com.softserve.edu.model.RoleData;
@@ -11,11 +13,10 @@ import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.UserService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Data
@@ -42,15 +43,19 @@ public class MarathonController {
   //new methods
 
     @GetMapping("/marathons")
-    public List<Marathon> listMarathons(@RequestHeader("Authorization") String token) {
+    public List<MarathonInfo> listMarathons(@RequestHeader("Authorization") String token) {
         log.info("**/marathons");
         String login = jwtProvider.getLoginFromToken(token.substring(BEARER.length()));
         User user = studentService.findByLogin(login);
         Role userRole = user.getRole();
         if (userRole.getName().equals(RoleData.ADMIN.toString())) {
-            return marathonService.getAll();
+            return marathonService.getAll().stream()
+                    .map(MarathonInfo::new)
+                    .collect(Collectors.toList());
         } else {
-            return marathonRepository.getAllByUsers(user);
+            return marathonRepository.getAllByUsers(user).stream()
+                    .map(MarathonInfo::new)
+                    .collect(Collectors.toList());
         }
     }
 
@@ -80,34 +85,12 @@ public class MarathonController {
     }
 
 
-
-
-
-
-
-//old methods
-
-
-//    @PreAuthorize("isAuthenticated()")
-//    @GetMapping("/students/{marathon_id}")
-//    public String getStudentsFromMarathon(@PathVariable("marathon_id") long marathonId, Model model) {
-//        WebAuthenticationToken authentication
-//                = (WebAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication.getAuthorities().stream()
-//                .anyMatch(authority -> authority.getAuthority().equals("TRAINEE"))) {
-//            return "redirect:/sprints/" + marathonId;
-//        }
-//        List<User> students = studentService.getAll().stream().filter(
-//                student -> student.getMarathons().stream().anyMatch(
-//                        marathon -> marathon.getId() == marathonId)).collect(Collectors.toList());
-//        Marathon marathon = marathonService.getMarathonById(marathonId);
-//        model.addAttribute("students", students);
-//        model.addAttribute("all_students", studentService.getAll());
-//        model.addAttribute("marathon", marathon);
-//        return "marathon-students";
-//    }
-
-
-
+    @GetMapping("/students/{marathon_id}")
+    public List<UserInfo> getStudentsFromMarathon(@PathVariable("marathon_id") long id) {
+        List<UserInfo> result = marathonService.getMarathonById(id).getUsers().stream()
+                .map(UserInfo::new)
+                .collect(Collectors.toList());
+        return result;
+    }
 
 }

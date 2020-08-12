@@ -3,7 +3,6 @@ package com.softserve.edu.controller;
 import com.softserve.edu.config.JwtProvider;
 import com.softserve.edu.dto.*;
 import com.softserve.edu.model.Marathon;
-import com.softserve.edu.model.Role;
 import com.softserve.edu.model.User;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.RoleService;
@@ -13,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,7 +56,7 @@ public class UserController {
                     String login,
             @RequestParam(value = "password", required = true)
                     String password) {
-//        log.info("**/signup userLogin = " + login);
+        log.info("**/signup userLogin = " + login);
         CreateOrUpdateUserRequest userRequest = new CreateOrUpdateUserRequest(login, password);
         return new OperationResponse(String.valueOf(userService.createUser(userRequest)));
     }
@@ -71,13 +68,12 @@ public class UserController {
                     String login,
             @RequestParam(value = "password", required = true)
                     String password) {
-//        log.info("**/signin userLogin = " + login);
+        log.info("**/signin userLogin = " + login);
         UserRequest userRequest = new UserRequest(login, password);
         UserResponse userResponse = userService.findByLoginAndPassword(userRequest);
         return new TokenResponse(jwtProvider.generateToken(userResponse.getEmail()));
     }
 
-    //updated
     @PostMapping("/create-user")
     public UserResponse createUser(CreateOrUpdateUserRequest request) {
         log.info("**/create-user");
@@ -91,37 +87,15 @@ public class UserController {
     }
 
 
-    //updated
     @PostMapping("students/{marathon_id}/add")
     public String addUserToMarathon(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
+        log.info("**/students/" + marathonId + "/add");
         userService.addUserToMarathon(
                 userService.getUserById(userId),
                 marathonService.getMarathonById(marathonId));
         return "User added to marathon " + marathonId;
     }
 
-//    @PostMapping("students/{marathon_id}/add")
-//    public String addUserToMarathon(User user, @PathVariable("marathon_id") long marathonId) {
-//        userService.addUserToMarathon(
-//                userService.getUserById(user.getId()),
-//                marathonService.getMarathonById(marathonId));
-//        return "User added to marathon " + marathonId;
-//    }
-
-//    @PreAuthorize("hasAuthority('MENTOR')")
-//    @GetMapping("/students/{marathon_id}/edit/{student_id}")
-//    public String updateStudent(@PathVariable("marathon_id") long marathonId, @PathVariable("student_id") long studentId,
-//                                Model model) {
-//        User user = userService.getUserById(studentId);
-//        List<Role> roles = roleService.getAll();
-//        model.addAttribute("user", user);
-//        model.addAttribute("roles", roles);
-//        model.addAttribute("marathon_id", marathonId);
-//        return "update-student";
-//    }
-
-
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/students/{marathon_id}/delete/{student_id}")
     public String deleteUser(@PathVariable("marathon_id") long marathonId, @PathVariable("student_id") long studentId) {
         userService.deleteUserFromMarathon(
@@ -130,18 +104,16 @@ public class UserController {
         return "redirect:/students/" + marathonId;
     }
 
-    //updated
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
     public List<User> getAllUsers() {
+        log.info("**/users");
         return userService.getAll();
     }
 
 
-    //update
-    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/user/{id}")
     public String deleteUser(@PathVariable long id) {
+        log.info("**/user/" + id);
         User user = userService.getUserById(id);
         for (Marathon marathon : user.getMarathons()) {
             userService.deleteUserFromMarathon(user, marathon);
@@ -150,11 +122,9 @@ public class UserController {
         return "Successfully deleted user with id " + id;
     }
 
-    //updated
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/user/{id}")
     public UserResponse showUser(@PathVariable("id") long id) {
+        log.info("**/user/" + id);
         return new UserResponse(userService.getUserById(id));
     }
-
 }

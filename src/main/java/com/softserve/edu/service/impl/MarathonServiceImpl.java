@@ -30,7 +30,7 @@ public class MarathonServiceImpl implements MarathonService {
     }
 
     public Marathon getMarathonById(Long id)  {
-        return marathonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No marathon /w id "+id)));// add to Logger later
+        return marathonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No marathon /w id "+id)));
     }
 
     public Marathon createOrUpdate(Marathon marathon)  {
