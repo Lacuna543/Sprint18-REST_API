@@ -1,5 +1,6 @@
 package com.softserve.edu.service;
 
+import com.softserve.edu.dto.CreateUserRequest;
 import com.softserve.edu.dto.UserRequest;
 import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.model.Marathon;
@@ -13,6 +14,7 @@ public interface UserService {
     List<User> getAll();
     User getUserById(Long id);
     UserDetails loadUserByUsername(String username);
+    boolean createUser(CreateUserRequest userRequest);
     boolean createOrUpdateUser(UserRequest userRequest);
     void deleteUserById(Long id);
     boolean addUserToMarathon(User user, Marathon marathon);

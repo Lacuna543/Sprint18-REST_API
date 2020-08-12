@@ -1,9 +1,11 @@
 package com.softserve.edu.service.impl;
 
+import com.softserve.edu.dto.CreateUserRequest;
 import com.softserve.edu.dto.UserRequest;
 import com.softserve.edu.dto.UserResponse;
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
+import com.softserve.edu.model.Role;
 import com.softserve.edu.model.RoleData;
 import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
@@ -78,6 +80,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setEmail(userRequest.getLogin());
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         return (userRepository.save(user) != null);
+    }
+
+    public boolean createUser(CreateUserRequest request) {
+        User newUser = new User();
+        newUser.setFirstName(request.getFirstName());
+        newUser.setLastName(request.getLastName());
+        newUser.setEmail(request.getEmail());
+        newUser.setPassword(request.getPassword());
+        newUser.setRole(roleRepository.findByName(request.getRole().toString()));//<--HARD CODE!!
+        return (userRepository.save(newUser) != null);
     }
 
     @Override

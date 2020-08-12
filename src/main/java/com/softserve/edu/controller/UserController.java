@@ -1,10 +1,7 @@
 package com.softserve.edu.controller;
 
 import com.softserve.edu.config.JwtProvider;
-import com.softserve.edu.dto.OperationResponse;
-import com.softserve.edu.dto.TokenResponse;
-import com.softserve.edu.dto.UserRequest;
-import com.softserve.edu.dto.UserResponse;
+import com.softserve.edu.dto.*;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Role;
 import com.softserve.edu.model.User;
@@ -12,6 +9,7 @@ import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.RoleService;
 import com.softserve.edu.service.UserService;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -25,6 +23,7 @@ import java.util.List;
 //@Controller
 @RestController
 @Data
+@Slf4j
 public class UserController {
 
     private UserService userService;
@@ -49,14 +48,7 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
-    @GetMapping("/create-student")
-    public String createStudent(Model model) {
-        List<Role> roles = roleService.getAll();
-        model.addAttribute("roles", roles);
-        model.addAttribute("user", new User());
-        return "create-student";
-    }
+
 
     @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
     public OperationResponse signUp() {
@@ -86,6 +78,28 @@ public class UserController {
         return new TokenResponse(jwtProvider.generateToken(userResponse.getLogin()));
     }
 
+    @PostMapping("/create-student")
+    public String createStudent(CreateUserRequest request) {
+        log.info("**/create-student");
+        userService.createUser(request);
+        return "create-student";
+    }
+
+    @PreAuthorize("hasAuthority('MENTOR')")
+    @GetMapping("students/{marathon_id}/add")
+    public String createStudent(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
+        userService.addUserToMarathon(
+                userService.getUserById(userId),
+                marathonService.getMarathonById(marathonId));
+        return "redirect:/students/" + marathonId;
+    }
+
+
+
+
+    //OLD METHODS
+
+
 //    @PreAuthorize("hasAuthority('MENTOR')")
 //    @PostMapping("students/add")
 //    public String createStudent(@RequestParam(value = "marathon_id", required = false, defaultValue = "0") long marathonId, @RequestParam("role_id") long roleId,
@@ -105,14 +119,14 @@ public class UserController {
 //        return "redirect:/students";
 //    }
 
-    @PreAuthorize("hasAuthority('MENTOR')")
-    @GetMapping("students/{marathon_id}/add")
-    public String createStudent(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
-        userService.addUserToMarathon(
-                userService.getUserById(userId),
-                marathonService.getMarathonById(marathonId));
-        return "redirect:/students/" + marathonId;
-    }
+//    @PreAuthorize("hasAuthority('MENTOR')")
+//    @GetMapping("students/{marathon_id}/add")
+//    public String createStudent(@RequestParam("user_id") long userId, @PathVariable("marathon_id") long marathonId) {
+//        userService.addUserToMarathon(
+//                userService.getUserById(userId),
+//                marathonService.getMarathonById(marathonId));
+//        return "redirect:/students/" + marathonId;
+//    }
 
     @PreAuthorize("hasAuthority('MENTOR')")
     @GetMapping("/students/{marathon_id}/edit/{student_id}")
