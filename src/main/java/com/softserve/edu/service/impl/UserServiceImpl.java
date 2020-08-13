@@ -48,13 +48,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     public UserResponse findByLoginAndPassword(UserRequest userRequest) {
-        UserResponse userResponse = null;
+//        UserResponse userResponse = null;
         User user = userRepository.getUserByEmail(userRequest.getEmail());
-        if (user != null) {
-            userResponse = new UserResponse(user);
-        }
-        return userResponse;
-    }   
+        return (user != null && passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) ? new UserResponse(user) : null;
+
+    }
 
     public List<User> getAll() {
         List<User> users = userRepository.findAll();
@@ -62,7 +60,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No user /w id "+id)));
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No user /w id " + id)));
     }
 
 //    public User createOrUpdateUser(User entity) {
@@ -109,7 +107,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserResponse updateUser(CreateOrUpdateUserRequest request, Long id) {
-        User newUser =userRepository.getOne(id);
+        User newUser = userRepository.getOne(id);
         return new UserResponse(fillUserFromUserRequest(request, newUser));
     }
 

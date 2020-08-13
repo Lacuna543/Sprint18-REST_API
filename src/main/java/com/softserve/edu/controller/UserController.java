@@ -8,6 +8,7 @@ import com.softserve.edu.model.User;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.RoleService;
 import com.softserve.edu.service.UserService;
+import com.softserve.edu.service.impl.RoleServiceImpl;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,20 +50,19 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
-    public OperationResponse signUp() {
-        return new OperationResponse("true");
-    }
-
     @PostMapping("/signup")
-    public OperationResponse signUp(
+    public UserResponse signUp(
             @RequestParam(value = "login", required = true)
                     String login,
             @RequestParam(value = "password", required = true)
-                    String password) {
+                    String password,
+            @RequestParam(value = "firstName", required = true)
+                    String firstName,
+            @RequestParam(value = "lastName", required = true)
+                    String lastName) {
 //        log.info("**/signup userLogin = " + login);
-        CreateOrUpdateUserRequest userRequest = new CreateOrUpdateUserRequest(login, password);
-        return new OperationResponse(String.valueOf(userService.createUser(userRequest)));
+        CreateOrUpdateUserRequest userRequest = new CreateOrUpdateUserRequest(login, password, firstName, lastName, "ROLE_USER");
+        return userService.createUser(userRequest);
     }
 
 
@@ -75,7 +75,18 @@ public class UserController {
 //        log.info("**/signin userLogin = " + login);
         UserRequest userRequest = new UserRequest(login, password);
         UserResponse userResponse = userService.findByLoginAndPassword(userRequest);
-        return new TokenResponse(jwtProvider.generateToken(userResponse.getEmail()));
+        try {
+            if (userResponse == null) {
+                throw new NullPointerException("Invalid credentials");
+            }
+        } catch (NullPointerException ex) {
+            TokenResponse tokenResponse = new TokenResponse();
+            tokenResponse.setError("Invalid credentials");
+            return tokenResponse;
+        }
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setToken(jwtProvider.generateToken(userResponse.getEmail()));
+        return tokenResponse;
     }
 
     //updated
@@ -88,7 +99,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/update-user/{user_id}")
-    public UserResponse updateUser(CreateOrUpdateUserRequest request, @PathVariable ("user_id") Long userId) {
+    public UserResponse updateUser(CreateOrUpdateUserRequest request, @PathVariable("user_id") Long userId) {
         log.info("**/update-user");
         return userService.updateUser(request, userId);
     }

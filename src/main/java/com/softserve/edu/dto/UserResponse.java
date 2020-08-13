@@ -18,17 +18,18 @@ public class UserResponse {
     private String firstName;
 
     private String lastName;
+    private String name;
 
-    private Role role;
 
-    private Long userId;
+    private RoleResponse role;
+
 
     public UserResponse(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
-        this.role = user.getRole();
-        this.userId = user.getId();
+        this.name = user.getFirstName() + " " + user.getLastName();
+        this.role = new RoleResponse(user.getRole());
     }
 }

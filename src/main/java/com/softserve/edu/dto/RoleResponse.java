@@ -1,5 +1,7 @@
 package com.softserve.edu.dto;
 
+import com.softserve.edu.model.Role;
+import com.softserve.edu.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,6 +9,9 @@ import lombok.Data;
 @Data
 public class RoleResponse {
 
-    private String rolename;
-    
+    private String roleName;
+
+    public RoleResponse(Role role) {
+        this.roleName = role.getName();
+    }
 }
