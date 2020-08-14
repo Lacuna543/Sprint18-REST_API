@@ -21,6 +21,7 @@ import javax.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -54,9 +55,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
-    public List<User> getAll() {
+    public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
-        return users.isEmpty() ? new ArrayList<>() : users;
+        List<UserResponse> userResponses =  users.stream().map(UserResponse::new).collect(Collectors.toList());
+       // return users.isEmpty() ? new ArrayList<>() : userResponses;
+        return userResponses;
     }
 
     public User getUserById(Long id) {
@@ -116,11 +119,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public boolean addUserToMarathon(User user, Marathon marathon) {
-        User userEntity = userRepository.getOne(user.getId());
-        Marathon marathonEntity = marathonRepository.getOne(marathon.getId());
-        marathonEntity.getUsers().add(userEntity);
-        return marathonRepository.save(marathonEntity) != null;
+    public Marathon addUserToMarathon(User user, Marathon marathon) {
+        marathon.getUsers().add(user);
+          return marathonRepository.save(marathon) ;
     }
 
     @Override

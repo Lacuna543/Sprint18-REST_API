@@ -128,19 +128,10 @@ public class UserController {
 //    }
 
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/students/{marathon_id}/delete/{student_id}")
-    public String deleteUser(@PathVariable("marathon_id") long marathonId, @PathVariable("student_id") long studentId) {
-        userService.deleteUserFromMarathon(
-                userService.getUserById(studentId),
-                marathonService.getMarathonById(marathonId));
-        return "redirect:/students/" + marathonId;
-    }
-
     //updated
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
-    public List<User> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return userService.getAll();
     }
 
@@ -149,10 +140,6 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/user/{id}")
     public String deleteUser(@PathVariable long id) {
-        User user = userService.getUserById(id);
-        for (Marathon marathon : user.getMarathons()) {
-            userService.deleteUserFromMarathon(user, marathon);
-        }
         userService.deleteUserById(id);
         return "Successfully deleted user with id " + id;
     }
