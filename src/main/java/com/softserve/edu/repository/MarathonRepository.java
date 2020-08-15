@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface MarathonRepository extends JpaRepository<Marathon, Long> {
     List<Marathon> getAllByUsers(User user);
+
 }

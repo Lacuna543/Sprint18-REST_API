@@ -2,13 +2,9 @@ package com.softserve.edu.controller;
 
 import com.softserve.edu.config.JwtProvider;
 import com.softserve.edu.dto.*;
-import com.softserve.edu.model.Marathon;
-import com.softserve.edu.model.Role;
-import com.softserve.edu.model.User;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.RoleService;
 import com.softserve.edu.service.UserService;
-import com.softserve.edu.service.impl.RoleServiceImpl;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +12,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Controller
 @RestController
 @Data
 @Slf4j
@@ -114,19 +108,6 @@ public class UserController {
                 marathonService.getMarathonById(marathonId));
         return "User added to marathon " + marathonId;
     }
-
-//    @PreAuthorize("hasAuthority('MENTOR')")
-//    @GetMapping("/students/{marathon_id}/edit/{student_id}")
-//    public String updateStudent(@PathVariable("marathon_id") long marathonId, @PathVariable("student_id") long studentId,
-//                                Model model) {
-//        User user = userService.getUserById(studentId);
-//        List<Role> roles = roleService.getAll();
-//        model.addAttribute("user", user);
-//        model.addAttribute("roles", roles);
-//        model.addAttribute("marathon_id", marathonId);
-//        return "update-student";
-//    }
-
 
     //updated
     @PreAuthorize("hasAuthority('ADMIN')")

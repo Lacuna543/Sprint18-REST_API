@@ -29,11 +29,11 @@ public class MarathonServiceImpl implements MarathonService {
         return marathons.isEmpty() ? new ArrayList<>() : marathons;
     }
 
-    public Marathon getMarathonById(Long id)  {
-        return marathonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No marathon /w id "+id)));// add to Logger later
+    public Marathon getMarathonById(Long id) {
+        return marathonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No marathon /w id " + id)));// add to Logger later
     }
 
-    public Marathon createOrUpdate(Marathon marathon)  {
+    public Marathon createOrUpdate(Marathon marathon) {
         if (marathon.getId() != null) {
 
             Optional<Marathon> marathonOptional = marathonRepository.findById(marathon.getId());
@@ -48,13 +48,12 @@ public class MarathonServiceImpl implements MarathonService {
         return marathonRepository.save(marathon);
     }
 
-    public void deleteMarathonById(Long id)
-    {
+    public void deleteMarathonById(Long id) {
         Optional<Marathon> marathon = marathonRepository.findById(id);
 
-        if(marathon.isPresent()){
+        if (marathon.isPresent()) {
             marathonRepository.deleteById(id);
-        } else{
+        } else {
             throw new EntityNotFoundException("No marathon exist for given id");
         }
     }

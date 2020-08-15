@@ -38,9 +38,7 @@ public class MarathonController {
         this.jwtProvider = jwtProvider;
         this.marathonRepository = marathonRepository;
     }
-
-  //new methods
-
+    
     @GetMapping("/marathons")
     public List<Marathon> listMarathons(@RequestHeader("Authorization") String token) {
         log.info("**/marathons");
