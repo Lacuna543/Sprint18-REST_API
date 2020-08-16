@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final MarathonRepository marathonRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
@@ -49,7 +49,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     public UserResponse findByLoginAndPassword(UserRequest userRequest) {
-//        UserResponse userResponse = null;
         User user = userRepository.getUserByEmail(userRequest.getEmail());
         return (user != null && passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) ? new UserResponse(user) : null;
 
@@ -57,8 +56,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
-        List<UserResponse> userResponses =  users.stream().map(UserResponse::new).collect(Collectors.toList());
-       // return users.isEmpty() ? new ArrayList<>() : userResponses;
+        List<UserResponse> userResponses = users.stream().map(UserResponse::new).collect(Collectors.toList());
         return userResponses;
     }
 
@@ -66,33 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No user /w id " + id)));
     }
 
-//    public User createOrUpdateUser(User entity) {
-//        return userRepository.save(entity);
-
-//    }
-
-//    public UserResponse createOrUpdateUser(CreateUserRequest userRequest) {
-//
-//        User newUser = new User();
-//        if (userRequest.getUserId() != null) {
-//
-//            Optional<User> userOptional = userRepository.findById(userRequest.getUserId());
-//
-//            if (userOptional.isPresent()) {
-//                newUser = userOptional.get();
-//            }
-//        }
-//
-//        newUser.setEmail(userRequest.getEmail());
-//        newUser.setPassword(userRequest.getPassword());
-//        newUser.setFirstName(userRequest.getFirstName());
-//        newUser.setLastName(userRequest.getLastName());
-//        newUser.setRole(userRequest.getRole());
-//
-//        userRepository.save(newUser);
-//        return new UserResponse(newUser);
-//    }
-
+    @Override
     public UserResponse createUser(CreateOrUpdateUserRequest request) {
         User newUser = new User();
         return new UserResponse(fillUserFromUserRequest(request, newUser));
@@ -121,7 +93,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     public Marathon addUserToMarathon(User user, Marathon marathon) {
         marathon.getUsers().add(user);
-          return marathonRepository.save(marathon) ;
+        return marathonRepository.save(marathon);
     }
 
     @Override

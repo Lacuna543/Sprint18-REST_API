@@ -1,11 +1,13 @@
 package com.softserve.edu.service.impl;
 
+import com.softserve.edu.dto.MarathonRequest;
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.RoleData;
 import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.service.MarathonService;
+import javassist.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -33,21 +35,25 @@ public class MarathonServiceImpl implements MarathonService {
         return marathonRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(("No marathon /w id " + id)));// add to Logger later
     }
 
-    public Marathon createOrUpdate(Marathon marathon) {
-        if (marathon.getId() != null) {
-
-            Optional<Marathon> marathonOptional = marathonRepository.findById(marathon.getId());
-
-            if (marathonOptional.isPresent()) {
-                Marathon newMarathon = marathonOptional.get();
-                newMarathon.setTitle(marathon.getTitle());
-                return marathonRepository.save(newMarathon);
-            }
-        }
-
+    @Override
+    public Marathon create(MarathonRequest marathonRequest) {
+        Marathon marathon = new Marathon();
+        marathon.setTitle(marathonRequest.getTitle());
         return marathonRepository.save(marathon);
     }
 
+    @Override
+    public Marathon update(MarathonRequest marathonRequest, Long id) throws NotFoundException {
+        Marathon marathon = marathonRepository.getOne(id);
+        if (marathon.getId() != null){
+        marathon.setTitle(marathonRequest.getTitle());
+        return marathonRepository.save(marathon);
+        }
+
+        throw new NotFoundException("This marathon doesn't exist");
+    }
+
+    @Override
     public void deleteMarathonById(Long id) {
         Optional<Marathon> marathon = marathonRepository.findById(id);
 

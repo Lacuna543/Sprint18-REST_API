@@ -9,6 +9,7 @@ import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.UserService;
+import javassist.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,57 +56,22 @@ public class MarathonController {
     @PostMapping("/create-marathon")
     public String createMarathon(MarathonRequest marathonRequest) {
         log.info("**/create-marathon");
-        Marathon marathon = new Marathon();
-        marathon.setTitle(marathonRequest.getTitle());
-        marathonService.createOrUpdate(marathon);
+        marathonService.create(marathonRequest);
         return "marathon successfully created";
     }
 
-    @GetMapping("/marathons/edit/{id}")
-    public String updateMarathon(@PathVariable long id, MarathonRequest marathonRequest) {
+    @PutMapping("/marathons/edit/{id}")
+    public String updateMarathon(@PathVariable long id, MarathonRequest marathonRequest) throws NotFoundException {
         log.info("**/marathons/edit/" + id);
-        Marathon marathon = marathonService.getMarathonById(id);
-        marathon.setTitle(marathonRequest.getTitle());
-        marathonService.createOrUpdate(marathon);
+        marathonService.update(marathonRequest, id);
         return "marathon successfully modified";
     }
 
-    @GetMapping("/marathons/delete/{id}")
+    @DeleteMapping("/marathons/delete/{id}")
     public String deleteMarathon(@PathVariable long id) {
         log.info("**/marathons/delete/" + id);
         marathonService.deleteMarathonById(id);
         return "marathon successfully deleted";
     }
-
-
-
-
-
-
-
-//old methods
-
-
-//    @PreAuthorize("isAuthenticated()")
-//    @GetMapping("/students/{marathon_id}")
-//    public String getStudentsFromMarathon(@PathVariable("marathon_id") long marathonId, Model model) {
-//        WebAuthenticationToken authentication
-//                = (WebAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication.getAuthorities().stream()
-//                .anyMatch(authority -> authority.getAuthority().equals("TRAINEE"))) {
-//            return "redirect:/sprints/" + marathonId;
-//        }
-//        List<User> students = studentService.getAll().stream().filter(
-//                student -> student.getMarathons().stream().anyMatch(
-//                        marathon -> marathon.getId() == marathonId)).collect(Collectors.toList());
-//        Marathon marathon = marathonService.getMarathonById(marathonId);
-//        model.addAttribute("students", students);
-//        model.addAttribute("all_students", studentService.getAll());
-//        model.addAttribute("marathon", marathon);
-//        return "marathon-students";
-//    }
-
-
-
 
 }

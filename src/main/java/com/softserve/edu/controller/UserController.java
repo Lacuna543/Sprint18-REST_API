@@ -37,11 +37,11 @@ public class UserController {
         this.jwtProvider = jwtProvider;
     }
 
-    @Autowired
-    @Qualifier("bCrypt")
-    public void setPasswordEncoder(@Lazy PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+//    @Autowired
+//    @Qualifier("bCrypt")
+//    public void setPasswordEncoder(@Lazy PasswordEncoder passwordEncoder) {
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
 
     @PostMapping("/signup")
@@ -54,7 +54,7 @@ public class UserController {
                     String firstName,
             @RequestParam(value = "lastName", required = true)
                     String lastName) {
-//        log.info("**/signup userLogin = " + login);
+        log.info("**/signup userLogin = " + login);
         CreateOrUpdateUserRequest userRequest = new CreateOrUpdateUserRequest(login, password, firstName, lastName, "ROLE_USER");
         return userService.createUser(userRequest);
     }
@@ -66,7 +66,7 @@ public class UserController {
                     String login,
             @RequestParam(value = "password", required = true)
                     String password) {
-//        log.info("**/signin userLogin = " + login);
+        log.info("**/signin userLogin = " + login);
         UserRequest userRequest = new UserRequest(login, password);
         UserResponse userResponse = userService.findByLoginAndPassword(userRequest);
         try {
