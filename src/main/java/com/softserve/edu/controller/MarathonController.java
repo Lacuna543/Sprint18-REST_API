@@ -2,6 +2,7 @@ package com.softserve.edu.controller;
 
 import com.softserve.edu.config.JwtProvider;
 import com.softserve.edu.dto.MarathonRequest;
+import com.softserve.edu.dto.MarathonResponse;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Role;
 import com.softserve.edu.model.RoleData;
@@ -12,8 +13,6 @@ import com.softserve.edu.service.UserService;
 import javassist.NotFoundException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,24 +53,24 @@ public class MarathonController {
     }
 
     @PostMapping("/create-marathon")
-    public String createMarathon(MarathonRequest marathonRequest) {
+    public MarathonResponse createMarathon(MarathonRequest marathonRequest) {
         log.info("**/create-marathon");
-        marathonService.create(marathonRequest);
-        return "marathon successfully created";
+        Marathon marathon = marathonService.createMarathon(marathonRequest);
+        return new MarathonResponse(marathon);
     }
 
     @PutMapping("/marathons/edit/{id}")
-    public String updateMarathon(@PathVariable long id, MarathonRequest marathonRequest) throws NotFoundException {
+    public MarathonResponse updateMarathon(@PathVariable long id, MarathonRequest marathonRequest) throws NotFoundException {
         log.info("**/marathons/edit/" + id);
-        marathonService.update(marathonRequest, id);
-        return "marathon successfully modified";
+        Marathon marathon = marathonService.update(marathonRequest, id);
+        return new MarathonResponse(marathon);
     }
 
     @DeleteMapping("/marathons/delete/{id}")
     public String deleteMarathon(@PathVariable long id) {
         log.info("**/marathons/delete/" + id);
-        marathonService.deleteMarathonById(id);
-        return "marathon successfully deleted";
+       marathonService.deleteMarathonById(id);
+        return "successfully deleted marathon with id " + id;
     }
 
 }

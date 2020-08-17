@@ -11,9 +11,10 @@ public interface MarathonService {
 
     Marathon getMarathonById(Long id);
 
-    Marathon create(MarathonRequest marathonRequest);
+    Marathon createMarathon(MarathonRequest marathonRequest);
 
     Marathon update(MarathonRequest marathonRequest, Long id) throws NotFoundException;
 
     void deleteMarathonById(Long id);
-}
+
+    }

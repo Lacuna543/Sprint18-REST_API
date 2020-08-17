@@ -1,13 +1,10 @@
 package com.softserve.edu.dto;
 
-import com.softserve.edu.model.Role;
 import com.softserve.edu.model.User;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 
-//@Builder
 @Data
 public class UserResponse {
     private Long id;

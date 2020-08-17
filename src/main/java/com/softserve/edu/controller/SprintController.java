@@ -1,10 +1,17 @@
 package com.softserve.edu.controller;
 
+import com.softserve.edu.dto.CreateOrUpdateUserRequest;
+import com.softserve.edu.dto.SprintRequest;
+import com.softserve.edu.dto.SprintResponse;
+import com.softserve.edu.dto.UserResponse;
+import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Sprint;
 import com.softserve.edu.model.User;
 //import com.softserve.edu.security.WebAuthenticationToken;
 import com.softserve.edu.service.MarathonService;
 import com.softserve.edu.service.SprintService;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +24,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Controller
+@RestController
+@Data
+@Slf4j
 public class SprintController {
 
     private SprintService sprintService;
@@ -28,27 +37,21 @@ public class SprintController {
         this.marathonService = marathonService;
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/create-sprint/{marathon_id}")
-    public String createSprint(@PathVariable("marathon_id") long marathonId, Model model) {
-        model.addAttribute("sprint", new Sprint());
-        return "create-sprint";
+    @PostMapping("/create-sprint/{marathon_id}")
+    public SprintResponse createSprint(@PathVariable("marathon_id") Long marathonId, SprintRequest sprintRequest) {
+        Sprint sprint = sprintService.addSprintToMarathon(sprintRequest, marathonService.getMarathonById(marathonId));
+        return new SprintResponse(sprint);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/create-sprint/{marathon_id}")
-    public String createSprint(@Validated @ModelAttribute Sprint sprint, @PathVariable("marathon_id") long marathonId,
-                               @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-                               @RequestParam("finish") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate finish,
-                               BindingResult result) {
 
-        if (result.hasErrors()) {
-            return "create-sprint/" + marathonId;
-        }
-        sprint.setStartDate(start);
-        sprint.setEndDate(finish);
-        sprintService.addSprintToMarathon(sprint, marathonService.getMarathonById(marathonId));
-        return "redirect:/sprints/" + marathonId;
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/update-sprint/{marathon_id}")
+    public SprintResponse updateSprint(SprintRequest sprintRequest, @PathVariable("marathon_id") Long marathonId, Marathon marathon) {
+        log.info("**/update-sprint");
+        marathon = marathonService.getMarathonById(marathonId);
+        Sprint sprint = sprintService.updateSprint(sprintRequest, marathonId, marathon);
+
+        return new SprintResponse(sprint);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('TRAINEE') and @sprintController.getMarathonIdByUser(#marathonId)")

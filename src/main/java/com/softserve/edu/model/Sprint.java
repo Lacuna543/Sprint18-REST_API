@@ -26,7 +26,7 @@ public class Sprint {
     private LocalDate endDate;
 
     @ToString.Exclude
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marathon_id", nullable = false)
     private Marathon marathon;
 

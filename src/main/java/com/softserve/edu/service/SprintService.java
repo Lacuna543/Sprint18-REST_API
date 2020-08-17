@@ -1,6 +1,7 @@
 package com.softserve.edu.service;
 
 
+import com.softserve.edu.dto.SprintRequest;
 import com.softserve.edu.model.Marathon;
 import com.softserve.edu.model.Sprint;
 
@@ -9,9 +10,10 @@ import java.util.List;
 public interface SprintService {
     List<Sprint> getSprintsByMarathonId(Long id);
 
-    boolean addSprintToMarathon(Sprint sprint, Marathon marathon);
+    Sprint addSprintToMarathon(SprintRequest sprintRequest, Marathon marathon);
 
-    boolean updateSprint(Sprint sprint);
+     Sprint updateSprint(SprintRequest sprintRequest, Long marathonId, Marathon marathon);
 
-    Sprint getSprintById(Long id);
+
+        Sprint getSprintById(Long id);
 }

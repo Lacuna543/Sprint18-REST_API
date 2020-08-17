@@ -3,12 +3,9 @@ package com.softserve.edu.service.impl;
 import com.softserve.edu.dto.MarathonRequest;
 import com.softserve.edu.exception.EntityNotFoundException;
 import com.softserve.edu.model.Marathon;
-import com.softserve.edu.model.RoleData;
-import com.softserve.edu.model.User;
 import com.softserve.edu.repository.MarathonRepository;
 import com.softserve.edu.service.MarathonService;
 import javassist.NotFoundException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -36,7 +33,7 @@ public class MarathonServiceImpl implements MarathonService {
     }
 
     @Override
-    public Marathon create(MarathonRequest marathonRequest) {
+    public Marathon createMarathon(MarathonRequest marathonRequest) {
         Marathon marathon = new Marathon();
         marathon.setTitle(marathonRequest.getTitle());
         return marathonRepository.save(marathon);
@@ -45,9 +42,9 @@ public class MarathonServiceImpl implements MarathonService {
     @Override
     public Marathon update(MarathonRequest marathonRequest, Long id) throws NotFoundException {
         Marathon marathon = marathonRepository.getOne(id);
-        if (marathon.getId() != null){
-        marathon.setTitle(marathonRequest.getTitle());
-        return marathonRepository.save(marathon);
+        if (marathon.getId() != null) {
+            marathon.setTitle(marathonRequest.getTitle());
+            return marathonRepository.save(marathon);
         }
 
         throw new NotFoundException("This marathon doesn't exist");
@@ -55,12 +52,12 @@ public class MarathonServiceImpl implements MarathonService {
 
     @Override
     public void deleteMarathonById(Long id) {
-        Optional<Marathon> marathon = marathonRepository.findById(id);
-
-        if (marathon.isPresent()) {
+        // Optional<Marathon> marathon = marathonRepository.findById(id);
+        Marathon marathon1 = marathonRepository.getOne(id);
+        if (marathon1 != null) {
             marathonRepository.deleteById(id);
-        } else {
+        } else
             throw new EntityNotFoundException("No marathon exist for given id");
-        }
+
     }
 }
